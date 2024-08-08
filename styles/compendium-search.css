@@ -1,0 +1,41 @@
+.document-hits {
+    flex: 1;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+}
+
+.document-hits .hit {
+    position: relative;
+    line-height: var(--sidebar-item-height);
+    border-top: 1px solid var(--color-border-dark-1);
+}
+
+.document-hits .hit img {
+    flex: 0 0 var(--sidebar-item-height);
+    height: var(--sidebar-item-height);
+    width: var(--sidebar-item-height);
+    object-fit: cover;
+    object-position: 50% 0;
+    border: none;
+}
+
+.document-hits .hit .name {
+    text-wrap: nowrap;
+    line-height: normal;
+}
+
+.document-hits .hit .details {
+    line-height: normal;
+    color: var(--color-light-3);
+    font-size: smaller;
+}
+
+.document-hits .hit .description {
+    display: flex;
+    flex-direction: column;
+    padding-left: 5px;
+    padding-top: 5px;
+    overflow: auto;
+}

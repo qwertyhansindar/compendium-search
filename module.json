@@ -1,0 +1,25 @@
+{
+  "id": "aedifs-compendium-search",
+  "title": "Aedif's Compendium Search",
+  "description": "Search compendiums and their contents.",
+  "version": "1.0.0",
+  "manifest": "https://github.com/Aedif/compendium-search/releases/latest/download/module.json",
+  "download": "https://github.com/Aedif/compendium-search/releases/download/1.2.1/aedifs-token-sounds.zip",
+  "compatibility": {
+    "minimum": 12,
+    "verified": 12
+  },
+  "authors": [
+    {
+      "name": "Aedif",
+      "url": "https://github.com/aedif",
+      "discord": "aedif"
+    }
+  ],
+  "esmodules": ["compendium-search.js"],
+  "scripts": [],
+  "styles": ["styles/compendium-search.css"],
+  "packs": [],
+  "url": "https://github.com/Aedif/compendium-search",
+  "readme": "https://github.com/Aedif/compendium-search/blob/master/README.md"
+}
