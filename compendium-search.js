@@ -8,10 +8,13 @@ Hooks.on('renderCompendiumDirectory', async (compendiumDirectory, html, options)
 
   html.find('.directory-list').append(documentSearch);
 
-  html.find('.header-search > input[type="search"]').on('input', async (event) => {
-    const hits = search(event.currentTarget.value);
-    await renderHits(hits, documentSearch);
-  });
+  html
+    .find('.header-search > input[type="search"]')
+    .on('input', async (event) => {
+      const hits = search(event.currentTarget.value);
+      await renderHits(hits, documentSearch);
+    })
+    .trigger('input');
 
   await getTemplate(`modules/${MODULE_ID}/templates/document-hits.html`);
   await getTemplate(`modules/${MODULE_ID}/templates/document-partial.html`);
@@ -21,34 +24,44 @@ function search(term) {
   const hits = [];
 
   if (!term || term.length <= 2) return hits;
-  term = term.toLowerCase();
+  term = term
+    .toLowerCase()
+    .split(' ')
+    .map((t) => t.trim())
+    .filter((t) => t.length > 2);
+  if (!term.length) return;
 
-  game.packs
-    .filter((p) => p.visible && !p.index.get('MassEditMetaData'))
-    .forEach((p) => {
-      const title = p.title;
-      const documentName = p.documentName;
+  let packs = game.packs.filter((p) => p.visible && !p.index.get('MassEditMetaData'));
 
-      //const cls = getDocumentClass(documentName);
+  // Apply document type filters
+  const filters = ui.compendium.activeFilters;
+  if (filters?.length) {
+    packs = packs.filter((p) => filters.includes(p.documentName));
+  }
 
-      p.index.forEach((i) => {
-        if (i.name?.toLowerCase().includes(term)) {
-          let typeLabel = documentName;
-          if (documentName === 'Item' || documentName === 'Actor') {
-            typeLabel = game.i18n.localize(
-              CONFIG[documentName].typeLabels[i.type] ?? CONFIG[documentName].typeLabels.base
-            );
-          }
+  packs.forEach((p) => {
+    const title = p.title;
+    const documentName = p.documentName;
 
-          hits.push({
-            name: i.name,
-            details: typeLabel + ' - ' + title,
-            thumbnail: i.img ?? i.thumb ?? getDocumentClass(documentName).DEFAULT_ICON,
-            uuid: i.uuid,
-          });
+    p.index.forEach((i) => {
+      let name = i.name?.toLowerCase();
+      if (term.every((t) => name?.includes(t))) {
+        let typeLabel = documentName;
+        if (documentName === 'Item' || documentName === 'Actor') {
+          typeLabel = game.i18n.localize(
+            CONFIG[documentName].typeLabels[i.type] ?? CONFIG[documentName].typeLabels.base
+          );
         }
-      });
+
+        hits.push({
+          name: i.name,
+          details: typeLabel + ' - ' + title,
+          thumbnail: i.img ?? i.thumb ?? getDocumentClass(documentName).DEFAULT_ICON,
+          uuid: i.uuid,
+        });
+      }
     });
+  });
 
   return hits;
 }
@@ -80,7 +93,7 @@ function _createDragDropHandlers(documentSearch) {
     callbacks: {
       dragstart: _onDragStart,
       //dragover: (...args) => console.log('dragover', ...args),
-      drop: (...args) => console.log('drop', ...args),
+      //drop: (...args) => console.log('drop', ...args),
     },
   });
 
@@ -94,10 +107,9 @@ function _onDragStart(event) {
   const result = foundry.utils.parseUuid(uuid);
 
   const dragData = {
-    type: result.type,
     uuid,
+    type: result.type ?? result.documentType, // v11
   };
-  console.log(dragData);
 
   event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
 }
