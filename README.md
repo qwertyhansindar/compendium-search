@@ -6,3 +6,6 @@
 # Compendium Search
 
 FoundryVTT module for searching compendiums within the sidebar.
+
+https://github.com/user-attachments/assets/3b95f03c-6cc0-4952-80fb-8f74485bd714
+
