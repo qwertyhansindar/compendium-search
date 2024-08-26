@@ -14,6 +14,7 @@ class Search {
     this.documentSearch.on('click', '.name', this.onEntryClick);
     html.find('.directory-list').append(this.documentSearch);
 
+    // Listen for input within the Search Bar and perform our own search
     html
       .find('.header-search > input[type="search"]')
       .on('input', async (event) => this.search(event.currentTarget.value))
@@ -38,6 +39,7 @@ class Search {
       .filter((t) => t.length > 2);
     if (!term.length) return;
 
+    // Filter hidden packs and Mass Edit preset packs
     let packs = game.packs.filter((p) => p.visible && !p.index.get('MassEditMetaData'));
 
     // Apply document type filters
