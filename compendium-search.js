@@ -2,7 +2,16 @@ const MODULE_ID = 'aedifs-compendium-search';
 
 const BACKUP_ICONS = {
   JournalEntry: 'icons/svg/book.svg',
+  Scene: 'icons/svg/ruins.svg',
 };
+
+const SEARCHABLE_WORLD_PACKS = [
+  { pack: 'actors', title: 'DOCUMENT.Actors', documentName: 'Actor' },
+  { pack: 'cards', title: 'DOCUMENT.CardsPlural', documentName: 'Cards' },
+  { pack: 'items', title: 'DOCUMENT.Items', documentName: 'Item' },
+  { pack: 'tables', title: 'DOCUMENT.RollTables', documentName: 'RollTable' },
+  { pack: 'scenes', title: 'DOCUMENT.Scenes', documentName: 'Scene' },
+];
 
 class Search {
   static async init(html) {
@@ -19,6 +28,9 @@ class Search {
       .find('.header-search > input[type="search"]')
       .on('input', async (event) => this.search(event.currentTarget.value))
       .trigger('input');
+
+    // Assign context menu options for world pack results
+    this._createContextMenu();
   }
 
   static search(term) {
@@ -48,32 +60,49 @@ class Search {
       packs = packs.filter((p) => filters.includes(p.documentName));
     }
 
+    // Search World Packs
+    if (this.searchWorldPacks) {
+      let wPacks = SEARCHABLE_WORLD_PACKS;
+
+      if (filters?.length) {
+        wPacks = wPacks.filter((p) => filters.includes(p.documentName));
+      }
+
+      wPacks.forEach((p) => {
+        const documentName = p.documentName;
+        const title = `${game.i18n.localize(p.title)} (${game.i18n.localize('PACKAGE.Type.world')})`;
+        game[p.pack].forEach((i) => this._hitTest(i, documentName, title, term, hits));
+      });
+    }
+
+    // Search Compendiums
     packs.forEach((p) => {
       const title = p.title;
       const documentName = p.documentName;
-
-      p.index.forEach((i) => {
-        let name = i.name?.toLowerCase();
-        if (term.every((t) => name?.includes(t))) {
-          let typeLabel = documentName;
-          if (documentName === 'Item' || documentName === 'Actor') {
-            typeLabel = game.i18n.localize(
-              CONFIG[documentName].typeLabels[i.type] ?? CONFIG[documentName].typeLabels.base
-            );
-          }
-
-          hits.push({
-            name: i.name,
-            details: typeLabel + ' - ' + title,
-            thumbnail: i.img ?? i.thumb ?? getDocumentClass(documentName).DEFAULT_ICON ?? BACKUP_ICONS[documentName],
-            uuid: i.uuid,
-            selector: documentName === 'Actor' ? 'actor' : 'other',
-          });
-        }
-      });
+      p.index.forEach((i) => this._hitTest(i, documentName, title, term, hits));
     });
 
     this.renderHits(hits);
+  }
+
+  static _hitTest(i, documentName, title, term, hits) {
+    let name = i.name?.toLowerCase();
+    if (term.every((t) => name?.includes(t))) {
+      let typeLabel = documentName;
+      if (documentName === 'Item' || documentName === 'Actor') {
+        typeLabel = game.i18n.localize(CONFIG[documentName].typeLabels[i.type] ?? CONFIG[documentName].typeLabels.base);
+      }
+
+      hits.push({
+        name: i.name,
+        details: typeLabel + ' - ' + title,
+        thumbnail: i.img ?? i.thumb ?? getDocumentClass(documentName).DEFAULT_ICON ?? BACKUP_ICONS[documentName],
+        uuid: i.uuid,
+        id: i.id,
+        selector: documentName === 'Actor' ? 'actor' : 'other',
+        documentName,
+      });
+    }
   }
 
   static async renderHits(hits) {
@@ -138,8 +167,32 @@ class Search {
     });
     ddOther.bind(this.documentSearch[0]);
   }
+
+  static _createContextMenu() {
+    SEARCHABLE_WORLD_PACKS.forEach((p) => {
+      ContextMenu.create(
+        {},
+        this.documentSearch,
+        `[data-document-name="${game[p.pack].documentName}"]`,
+        ui[p.pack]._getEntryContextOptions()
+      );
+    });
+  }
 }
 
 Hooks.on('renderCompendiumDirectory', async (compendiumDirectory, html, options) => {
   Search.init(html);
+});
+
+Hooks.on('init', () => {
+  game.settings.register(MODULE_ID, 'searchWorldPacks', {
+    name: game.i18n.localize(`${MODULE_ID}.settings.searchWorldPacks.Name`),
+    hint: '',
+    scope: 'world',
+    config: true,
+    type: Boolean,
+    default: false,
+    onChange: (val) => (Search.searchWorldPacks = val),
+  });
+  Search.searchWorldPacks = game.settings.get(MODULE_ID, 'searchWorldPacks');
 });
