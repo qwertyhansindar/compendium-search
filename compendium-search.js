@@ -193,7 +193,7 @@ Hooks.on('renderCompendiumDirectory', async (compendiumDirectory, html, options)
 Hooks.on('init', () => {
   game.settings.register(MODULE_ID, 'searchWorldPacks', {
     name: game.i18n.localize(`${MODULE_ID}.settings.searchWorldPacks.Name`),
-    hint: '',
+    hint: game.i18n.localize(`${MODULE_ID}.settings.searchWorldPacks.Hint`),
     scope: 'world',
     config: true,
     type: Boolean,

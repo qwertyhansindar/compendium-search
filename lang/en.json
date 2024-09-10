@@ -1,3 +1,4 @@
 {
-    "aedifs-compendium-search.settings.searchWorldPacks.Name" : "Search world documents"
+    "aedifs-compendium-search.settings.searchWorldPacks.Name" : "Search world documents",
+    "aedifs-compendium-search.settings.searchWorldPacks.Hint" : "Include documents created in or imported into the world within searches"
 }
