@@ -11,6 +11,7 @@ const SEARCHABLE_WORLD_PACKS = [
   { pack: 'items', title: 'DOCUMENT.Items', documentName: 'Item' },
   { pack: 'tables', title: 'DOCUMENT.RollTables', documentName: 'RollTable' },
   { pack: 'scenes', title: 'DOCUMENT.Scenes', documentName: 'Scene' },
+  { pack: 'journal', title: 'DOCUMENT.JournalEntries', documentName: 'JournalEntry' },
 ];
 
 class Search {
@@ -161,8 +162,6 @@ class Search {
       },
       callbacks: {
         dragstart: this._onDragStart,
-        //dragover: (...args) => console.log('dragover', ...args),
-        //drop: (...args) => console.log('drop', ...args),
       },
     });
     ddOther.bind(this.documentSearch[0]);
@@ -171,7 +170,14 @@ class Search {
   static _createContextMenu() {
     SEARCHABLE_WORLD_PACKS.forEach((p) => {
       ContextMenu.create(
-        {},
+        {
+          // Faking an app here to return an empty array for v11 compatibility
+          constructor: {
+            _getInheritanceChain: () => {
+              return [];
+            },
+          },
+        },
         this.documentSearch,
         `[data-document-name="${game[p.pack].documentName}"]`,
         ui[p.pack]._getEntryContextOptions()
