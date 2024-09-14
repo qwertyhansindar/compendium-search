@@ -1,10 +1,10 @@
 {
-  "id": "aedifs-compendium-search",
-  "title": "Aedif's Compendium Search",
+  "id": "aedifs-sindar-compendium-search",
+  "title": "Aedif's(Sindar) Compendium Search",
   "description": "Search compendiums and their contents.",
   "version": "1.2.0",
-  "manifest": "https://github.com/Aedif/compendium-search/releases/latest/download/module.json",
-  "download": "https://github.com/Aedif/compendium-search/releases/download/1.2.0/aedifs-compendium-search.zip",
+  "manifest": "https://raw.githubusercontent.com/qwertyhansindar/compendium-search/own-usage/module.json",
+  "download": "https://github.com/qwertyhansindar/compendium-search/archive/refs/heads/own-usage.zip",  
   "compatibility": {
     "minimum": 11,
     "verified": 12
@@ -27,6 +27,6 @@
     }
   ],
   "packs": [],
-  "url": "https://github.com/Aedif/compendium-search",
-  "readme": "https://github.com/Aedif/compendium-search/blob/master/README.md"
+  "url": "https://github.com/qwertyhansindar/compendium-search/",
+  "readme": "https://github.com/qwertyhansindar/compendium-search/blob/own-usage/README.md"
 }
